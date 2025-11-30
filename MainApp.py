@@ -1,6 +1,10 @@
 import yfinance as yf
+import math as m
+import pandas as pd
 from datetime import datetime
 from tickerCache import TickerCache
+
+# yf.enable_debug_mode()
 
 def get_latest_close(ticker_data):
     return ticker_data['Close'].iloc[-1]
@@ -31,14 +35,14 @@ def analyse(ticker_data):
     highest = get_high_market_price(ticker_data)
     lowest = get_low_market_price(ticker_data)
 
-    data_of_current_year = ticker_data[ticker_data.index.year == datetime.now().year]
-    start_market_price = data_of_current_year.iloc[0]["Open"]
-    performance = ((latest_market_price.item() - start_market_price.item()) / start_market_price.item()) * 100
-
     print(f"Aktueller Schlusskurs ({ticker_data.index[-1].date()}): ${latest_market_price.item()}")
     print(f"Historischer Höchstkurs ({interval_text}): ${highest[0]} am {highest[1].strftime("%d.%m.%Y")}")
     print(f"Historischer Tiefstkurs ({interval_text}): ${lowest[0]} am {lowest[1].strftime("%d.%m.%Y")}")
-    print(f"Performance seit Jahresbeginn (YTD): {performance:.2f}% (Startkurs: ${start_market_price.item()} - Schlusskurs: ${latest_market_price.item()})")
+
+    data_of_current_year = ticker_data[ticker_data.index.year == datetime.now().year]
+    start_kurs = data_of_current_year.iloc[0]["Open"]
+    performance = ((latest_market_price.item() - start_kurs.item()) / start_kurs.item()) * 100
+    print(f"Performance seit Jahresbeginn (YTD): {performance:.2f}% (Startkurs: ${start_kurs.item()} - Schlusskurs: ${latest_market_price.item()})")
 
 class Singleton:
     __instance = None
