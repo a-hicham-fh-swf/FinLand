@@ -77,15 +77,26 @@ class TickerWrapper(Singleton):
         return data
 
 myTicker = TickerWrapper()
+"""
+print(id(myTicker))
+print(myTicker._TickerWrapper__ticker_cache.ttl)
+myTicker2 = TickerWrapper(5)
+print(id(myTicker2))
+print(myTicker2._TickerWrapper__ticker_cache.ttl)
+"""
 
 while True:
     ticker_input = input("------------------------------------------------------------\nWelche Ticker sollen angezeigt werden? (z.B. AAPL, NVDA): ")
-
     if not ticker_input:
         break
 
+    ticker_period = input("Für welchen Zeitraum in Monate? (keine oder eine ungültige Angabe ruft die Daten der letzten 12 Monate ab)")
+    if not ticker_period.isdigit():
+        ticker_period = "12"
+    ticker_period += "mo"
+
     try:
-        ticker_Data = myTicker.get_ticker_data([ticker.strip().upper() for ticker in ticker_input.split(",")])
+        ticker_Data = myTicker.get_ticker_data([ticker.strip().upper() for ticker in ticker_input.split(",")], period=ticker_period)
         for ticker in ticker_Data:
             print(f"\nAktuelle Daten für {ticker}")
             analyse(ticker_Data[ticker])
