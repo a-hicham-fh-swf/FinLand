@@ -1,6 +1,6 @@
 import yfinance as yf
 from datetime import datetime
-from tickerCache import TickerCache
+from Utils import Singleton, TickerCache
 
 # yf.enable_debug_mode()
 
@@ -41,14 +41,6 @@ def analyse(ticker_data):
     print(f"Historischer Höchstkurs ({interval_text}): ${highest[0]} am {highest[1].strftime("%d.%m.%Y")}")
     print(f"Historischer Tiefstkurs ({interval_text}): ${lowest[0]} am {lowest[1].strftime("%d.%m.%Y")}")
     print(f"Performance seit Jahresbeginn (YTD): {performance:.2f}% (Startkurs: ${start_market_price.item()} - Schlusskurs: ${latest_market_price.item()})")
-
-class Singleton:
-    __instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls.__instance:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
 
 class TickerWrapper(Singleton):
     __ticker_cache = TickerCache()
