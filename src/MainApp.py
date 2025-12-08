@@ -1,37 +1,16 @@
 import yfinance as yf
 from datetime import datetime
 from Utils import Singleton, TickerCache
+import TickerUtils as tu
 
 # yf.enable_debug_mode()
 
-def get_latest_close(ticker_data):
-    return ticker_data['Close'].iloc[-1]
-
-def get_interval_text(ticker_data):
-    start_date = get_start_date(ticker_data)
-    end_date = get_end_date(ticker_data)
-    return f'vom {start_date.strftime("%d.%m.%Y")} bis {end_date.strftime("%d.%m.%Y")}'
-
-def get_start_date(ticker_data):
-    return ticker_data.index.min().date()
-
-def get_end_date(ticker_data):
-    return ticker_data.index.max().date()
-
-def get_high_market_price(ticker_data):
-    high_market_price_date = ticker_data['High'].idxmax()
-    return ticker_data.loc[high_market_price_date]['High'], high_market_price_date
-
-def get_low_market_price(ticker_data):
-    low_market_price_date = ticker_data['Low'].idxmin()
-    return ticker_data.loc[low_market_price_date]['Low'], low_market_price_date
-
 def analyse(ticker_data):
-    interval_text = get_interval_text(ticker_data)
+    interval_text = tu.get_interval_text(ticker_data)
 
-    latest_market_price = get_latest_close(ticker_data)
-    highest = get_high_market_price(ticker_data)
-    lowest = get_low_market_price(ticker_data)
+    latest_market_price = tu.get_latest_close(ticker_data)
+    highest = tu.get_high_market_price(ticker_data)
+    lowest = tu.get_low_market_price(ticker_data)
 
     data_of_current_year = ticker_data[ticker_data.index.year == datetime.now().year]
     start_market_price = data_of_current_year.iloc[0]["Open"]
@@ -61,18 +40,21 @@ class TickerWrapper(Singleton):
         if isinstance(tickers, str):
             tickers = [tickers]
 
-        data = {ticker: self.__ticker_cache.get(ticker) for ticker in tickers}
+        data = {ticker: self.__ticker_cache.get(ticker, period) for ticker in tickers}
         missing_tickers = [key for key, value in data.items() if value is None]
+
+        period = tu.get_next_suitable_period(period)
 
         if missing_tickers:
             try:
                 fetched_data = yf.download(missing_tickers, period=period, group_by='ticker', rounding=True)
-                updated_data = {missing_ticker: fetched_data[missing_ticker] for missing_ticker in missing_tickers}
-                data.update(updated_data)
-                self.__ticker_cache.set_tickers(updated_data)
             except Exception as e:
                 print(f"Fehler beim Abruf der Daten: {e}")
                 return None
+
+            updated_data = {missing_ticker: fetched_data[missing_ticker] for missing_ticker in missing_tickers}
+            data.update(updated_data)
+            self.__ticker_cache.set_tickers(updated_data, period)
 
         return data
 

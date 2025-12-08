@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import TickerUtils as tu
+
 
 class Singleton:
     __instance = None
@@ -14,23 +16,26 @@ class TickerCache:
         self.cache.setdefault(None)
         self.ttl = timedelta(minutes=ttl_minutes)
 
-    def get(self, ticker):
+    def get(self, ticker, period, now=datetime.now()):
         """Holt Daten aus dem Cache, wenn noch gültig"""
         if ticker in self.cache:
-            data, timestamp = self.cache[ticker]
-            if datetime.now() - timestamp < self.ttl:
-                return data
+            cached_data, cached_min_date, cached_timestamp = self.cache[ticker]
+            min_date = tu.get_min_date_in_period_from_now(period, now)
+            if now - cached_timestamp < self.ttl and min_date >= cached_min_date:
+                return cached_data
         return None
 
-    def set_ticker(self, ticker, data):
+    def set_ticker(self, ticker, data, min_date, now):
         """Speichert Daten mit aktuellem Zeitstempel"""
-        self.cache[ticker] = (data, datetime.now())
+        self.cache[ticker] = (data, min_date, now)
 
-    def set_tickers(self, tickers):
+    def set_tickers(self, tickers, period):
         """Speichert Daten in dem Cache"""
         if isinstance(tickers, dict):
+            now = datetime.now()
+            min_date = tu.get_min_date_in_period_from_now(period, now)
             for ticker in tickers:
-                self.set_ticker(ticker, tickers[ticker])
+                self.set_ticker(ticker, tickers[ticker], min_date, now)
 
     def clear_ticker(self, ticker):
         """löscht den Eintrag mit dem Key ticker"""
