@@ -1,2 +1,5 @@
 yfinance==0.2.66
 pandas==2.3.3
+python-dateutil==2.9.0.post0
+streamlit==1.49.0
+feedparser==6.0.11

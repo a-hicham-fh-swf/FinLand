@@ -17,8 +17,8 @@ def analyse(ticker_data):
     performance = ((latest_market_price.item() - start_market_price.item()) / start_market_price.item()) * 100
 
     print(f"Aktueller Schlusskurs ({ticker_data.index[-1].date()}): ${latest_market_price.item()}")
-    print(f"Historischer Höchstkurs ({interval_text}): ${highest[0]} am {highest[1].strftime('%d.%m.%Y')}")
-    print(f"Historischer Tiefstkurs ({interval_text}): ${lowest[0]} am {lowest[1].strftime('%d.%m.%Y')}")
+    print(f"Historischer Höchstkurs ({interval_text}): ${highest[0]} am {highest[1].strftime("%d.%m.%Y")}")
+    print(f"Historischer Tiefstkurs ({interval_text}): ${lowest[0]} am {lowest[1].strftime("%d.%m.%Y")}")
     print(f"Performance seit Jahresbeginn (YTD): {performance:.2f}% (Startkurs: ${start_market_price.item()} - Schlusskurs: ${latest_market_price.item()})")
 
 class TickerWrapper(Singleton):
@@ -43,7 +43,7 @@ class TickerWrapper(Singleton):
         data = {ticker: self.__ticker_cache.get(ticker, period) for ticker in tickers}
         missing_tickers = [key for key, value in data.items() if value is None]
 
-        period = tu.get_next_suitable_period(period) or "1y"
+        period = tu.get_next_suitable_period(period)
 
         if missing_tickers:
             try:
@@ -52,45 +52,35 @@ class TickerWrapper(Singleton):
                 print(f"Fehler beim Abruf der Daten: {e}")
                 return None
 
-            if len(missing_tickers) == 1 and missing_tickers[0] not in fetched_data.columns:
-                updated_data = {missing_tickers[0]: fetched_data}
-            else:
-                updated_data = {t: fetched_data[t] for t in missing_tickers}
+            updated_data = {missing_ticker: fetched_data[missing_ticker] for missing_ticker in missing_tickers}
             data.update(updated_data)
             self.__ticker_cache.set_tickers(updated_data, period)
 
         return data
 
-def main():
-    myTicker = TickerWrapper()
+myTicker = TickerWrapper()
+"""
+print(id(myTicker))
+print(myTicker._TickerWrapper__ticker_cache.ttl)
+myTicker2 = TickerWrapper(5)
+print(id(myTicker2))
+print(myTicker2._TickerWrapper__ticker_cache.ttl)
+"""
 
-    while True:
-        ticker_input = input(
-            "------------------------------------------------------------\n"
-            "Welche Ticker sollen angezeigt werden? (z.B. AAPL, NVDA): "
-        )
-        if not ticker_input:
-            break
+while True:
+    ticker_input = input("------------------------------------------------------------\nWelche Ticker sollen angezeigt werden? (z.B. AAPL, NVDA): ")
+    if not ticker_input:
+        break
 
-        ticker_period = input(
-            "Für welchen Zeitraum in Monate? "
-            "(keine oder eine ungültige Angabe ruft die Daten der letzten 12 Monate ab)"
-        )
-        if not ticker_period.isdigit():
-            ticker_period = "12"
-        ticker_period += "mo"
+    ticker_period = input("Für welchen Zeitraum in Monate? (keine oder eine ungültige Angabe ruft die Daten der letzten 12 Monate ab)")
+    if not ticker_period.isdigit():
+        ticker_period = "12"
+    ticker_period += "mo"
 
-        try:
-            ticker_Data = myTicker.get_ticker_data(
-                [ticker.strip().upper() for ticker in ticker_input.split(",")],
-                period=ticker_period
-            )
-            for ticker in ticker_Data:
-                print(f"\nAktuelle Daten für {ticker}")
-                analyse(ticker_Data[ticker])
-        except Exception:
-            print("Fehler beim Abfragen der Daten")
-
-
-if __name__ == "__main__":
-    main()
+    try:
+        ticker_Data = myTicker.get_ticker_data([ticker.strip().upper() for ticker in ticker_input.split(",")], period=ticker_period)
+        for ticker in ticker_Data:
+            print(f"\nAktuelle Daten für {ticker}")
+            analyse(ticker_Data[ticker])
+    except Exception as e:
+        print(f'Fehler beim Abfragen der Daten')
