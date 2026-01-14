@@ -8,7 +8,10 @@ import TickerUtils as tu
 st.set_page_config(page_title="Aktien Dashboard", layout="wide")
 service = TickerWrapper(ttl_minutes=3)
 st.title("📈 Aktien Dashboard")
-tickers = set()
+
+if "tickers" not in st.session_state:
+    st.session_state.tickers = set()
+tickers = st.session_state.tickers
 
 # ---------------- Sidebar Controls ----------------
 with st.sidebar:
@@ -22,7 +25,7 @@ with st.sidebar:
         clear_on_submit=True
     )
 
-    if selected:
+    if selected and selected['symbol']:
         symbol = selected['symbol']
         #current_tickers = st.session_state.tickers_raw.split(',')
         #current_tickers = [t.strip() for t in current_tickers if t.strip()]
@@ -85,7 +88,7 @@ if not available_tickers:
 
 # Sidebar ticker multiselect (nach Datenload)
 with st.sidebar:
-    active = st.multiselect("Aktive Ticker", options=available_tickers, default=available_tickers[:1])
+    active = st.multiselect("Aktive Ticker", options=available_tickers, default=available_tickers[0])
 
 if not active:
     st.info("Bitte mindestens einen aktiven Ticker auswählen.")
@@ -135,7 +138,6 @@ with left:
 with right:
     st.subheader("Kennzahlen")
 
-    # KPIs vom ersten aktiven Ticker (übersichtlich)
     t0 = active[0]
     df0 = data[t0]
     info0 = info.get(t0, {}) or {}
@@ -150,14 +152,12 @@ with right:
         except Exception:
             return "n/a"
 
-    # Basis aus euren Utils
     close = tu.get_latest_close(df0) if df0 is not None else None
     interval_text = tu.get_interval_text(df0) if df0 is not None else "n/a"
 
     hi, hi_date = tu.get_high_market_price(df0) if df0 is not None else (None, None)
     lo, lo_date = tu.get_low_market_price(df0) if df0 is not None else (None, None)
 
-    # YTD Performance (wie bei dir)
     ytd = None
     if df0 is not None and not df0.empty:
         data_year = df0[df0.index.year == datetime.now().year]
@@ -196,6 +196,7 @@ with right:
         st.write("Keine News gefunden.")
     else:
         for item in news_items[:8]:
+            item = item["content"]
             title = item.get("title") or "(ohne Titel)"
 
             # 🔧 FIX: beide Zeitstempel unterstützen
