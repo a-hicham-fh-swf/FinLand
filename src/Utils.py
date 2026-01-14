@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import TickerUtils as tu
 
-
 class Singleton:
     __instance = None
 

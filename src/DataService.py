@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 from urllib.parse import quote_plus  # <-- WICHTIG
 import feedparser
-
+import requests
 from Utils import Singleton, TickerCache
 import TickerUtils as tu
 
@@ -27,6 +27,32 @@ def _google_news_rss(query: str, lang="de", country="DE"):
         })
     return items
 
+
+def search_ticker(search_term):
+    """Search for stock tickers based on company name"""
+    if not search_term:
+        return []
+
+    # Example using Alpha Vantage API
+    api_key = "ZG5QW2VAJ42NFEAX"
+    url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={search_term}&apikey={api_key}"
+
+    response = requests.get(url)
+    data = response.json()
+
+    results = []
+    if "bestMatches" in data:
+        for match in data["bestMatches"]:
+            symbol = match["1. symbol"]
+            name = match["2. name"]
+            results.append(
+                (
+                    f"{name} ({symbol})",
+                    {"name": name, "symbol": symbol}
+                )
+            )
+
+    return results
 
 def _normalize_history_frame(fetched: pd.DataFrame, ticker: str) -> pd.DataFrame | None:
     if fetched is None or fetched.empty:
@@ -117,6 +143,12 @@ class TickerWrapper(Singleton):
     def get_info(self, ticker):
         try:
             return yf.Ticker(ticker).info or {}
+        except Exception:
+            return {}
+
+    def get_company_name_and_symbol(self, search_term):
+        try:
+            return search_ticker(search_term)
         except Exception:
             return {}
 

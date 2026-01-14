@@ -1,7 +1,7 @@
-import math
-from datetime import timedelta, datetime
-from dateutil.relativedelta import relativedelta
 import re
+from datetime import timedelta, datetime
+
+from dateutil.relativedelta import relativedelta
 
 __compiled_pattern = re.compile('^([1-9][0-9]*)(d|mo|y)$')
 
@@ -74,16 +74,16 @@ def get_next_suitable_period(period_input):
     if years >= 1:
         if (years == 1 or years == 2) and months == 0:
             return str(years) + 'y'
-        if years < 5:
+        if years <= 5:
             return '5y'
-        if years < 10:
+        if years <= 10:
             return '10y'
     elif months >= 1:
         if months == 1:
             return '1mo'
-        if months < 4:
+        if months <= 3:
             return '3mo'
-        if months < 7:
+        if months <= 6:
             return '6mo'
         return '1y'
     elif days >= 1:

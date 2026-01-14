@@ -1,26 +1,39 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-
+from streamlit_searchbox import st_searchbox
 from DataService import TickerWrapper
 import TickerUtils as tu
 
-
 st.set_page_config(page_title="Aktien Dashboard", layout="wide")
-
 service = TickerWrapper(ttl_minutes=3)
-
-st.title("📈 Aktien Dashboard (Streamlit)")
+st.title("📈 Aktien Dashboard")
+tickers = set()
 
 # ---------------- Sidebar Controls ----------------
 with st.sidebar:
     st.header("Einstellungen")
 
-    tickers_raw = st.text_input("Ticker (kommagetrennt)", value="AAPL, NVDA")
-    tickers = [t.strip().upper() for t in tickers_raw.split(",") if t.strip()]
+    selected = st_searchbox(
+        service.get_company_name_and_symbol,
+        key="ticker_search",
+        placeholder="Unternehmensname...",
+        label="Unternehmen",
+        clear_on_submit=True
+    )
 
-    period_label = st.selectbox("Zeitraum (Period)", ["1M", "6M", "1Y", "5Y"], index=2)
-    period_map = {"1M": "1mo", "6M": "6mo", "1Y": "1y", "5Y": "5y"}
+    if selected:
+        symbol = selected['symbol']
+        #current_tickers = st.session_state.tickers_raw.split(',')
+        #current_tickers = [t.strip() for t in current_tickers if t.strip()]
+
+        tickers.add(symbol)
+
+    #tickers_raw = st.text_input(label="Ticker (kommagetrennt)", key="tickers_raw")
+    #tickers = [t.strip().upper() for t in tickers_raw.split(",") if t.strip()]
+
+    period_label = st.selectbox("Zeitraum (Period)", ["1D", "5D", "1M", "3M", "6M", "1Y", "2Y", "5Y", "10Y", "YTD", "MAX"], index=3)
+    period_map = {"1D": "1d", "5D": "5d", "1M": "1mo", "3M": "3mo", "6M": "6mo", "1Y": "1y", "2Y": "2y", "5Y": "5y", "10Y": "10y", "YTD": "ytd", "MAX": "max"}
     period = period_map[period_label]
 
     st.markdown("---")
@@ -46,19 +59,19 @@ if not tickers:
 def load_data_cached(tickers_tuple, period, use_dates, start_str, end_str):
     tickers_list = list(tickers_tuple)
     if use_dates:
-        data = service.get_ticker_data_by_dates(tickers_list, start_str, end_str)
+        data = service.get_ticker_data_by_dates(tickers_tuple, start_str, end_str)
     else:
-        data = service.get_ticker_data(tickers_list, period=period)
+        data = service.get_ticker_data(tickers_tuple, period=period)
 
-    info = {t: service.get_info(t) for t in tickers_list}
-    news = {t: service.get_news(t, limit=10) for t in tickers_list}
+    info = {t: service.get_info(t) for t in tickers_tuple}
+    news = {t: service.get_news(t, limit=10) for t in tickers_tuple}
     return data, info, news
 
 start_str = start_date.strftime("%Y-%m-%d")
 end_str = end_date.strftime("%Y-%m-%d")
 
 with st.spinner("Lade Marktdaten…"):
-    data, info, news = load_data_cached(tuple(tickers), period, use_dates, start_str, end_str)
+    data, info, news = load_data_cached(tickers, period, use_dates, start_str, end_str)
 
 available_tickers = [t for t in tickers if data.get(t) is not None and not data.get(t).empty]
 missing_tickers = [t for t in tickers if t not in available_tickers]
@@ -116,7 +129,7 @@ with left:
             st.line_chart(chart_df, height=520, use_container_width=True)
 
     with st.expander("Rohdaten anzeigen"):
-        st.dataframe(data[active[0]].tail(25), use_container_width=True)
+        st.dataframe(data[active[0]], use_container_width=True)
 
 
 with right:
@@ -159,7 +172,7 @@ with right:
     currency = info0.get("currency", "")
 
     # Streamlit Metrics
-    st.metric("Ticker", t0)
+    st.metric("Ticker", info0.get("longName", t0))
     st.metric("Kurs (Close)", f"{fmt(float(close) if close is not None else None)} {currency}".strip())
     st.caption(interval_text)
 
