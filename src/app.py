@@ -210,11 +210,11 @@ with right:
                     when = ""
 
             # 🔧 FIX: Link aus RSS oder yfinance
-            link = item.get("link") or item.get("url") or ""
+            link = item.get("link") or item.get("url") or item.get("canonicalUrl").get("url") or item.get("clickThroughUrl").get("url") or ""
 
             if link:
                 st.markdown(
-                    f"• [{title}]({link})"
+                    f"• [{title}](<{link}>)"
                     + (f"  \n<span style='color:gray'>{when}</span>" if when else ""),
                     unsafe_allow_html=True,
                 )
