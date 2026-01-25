@@ -1,5 +1,5 @@
 import re
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 
@@ -33,14 +33,14 @@ def get_min_date_in_period_from_now(period, now):
     match period:
         case '1d': return (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
         case '5d': return (now - timedelta(days=5)).replace(hour=0, minute=0, second=0, microsecond=0)
-        case '1mo': return (now - relativedelta(month=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-        case '3mo': return (now - relativedelta(month=3)).replace(hour=0, minute=0, second=0, microsecond=0)
-        case '6mo': return (now - relativedelta(month=6)).replace(hour=0, minute=0, second=0, microsecond=0)
-        case '1y': return (now - relativedelta(year=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-        case '2y': return (now - relativedelta(year=2)).replace(hour=0, minute=0, second=0, microsecond=0)
-        case '5y': return (now - relativedelta(year=5)).replace(hour=0, minute=0, second=0, microsecond=0)
-        case '10y': return (now - relativedelta(year=10)).replace(hour=0, minute=0, second=0, microsecond=0)
-        case 'ytd': return datetime(datetime.now().year, 1, 1)
+        case '1mo': return (now - relativedelta(months=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        case '3mo': return (now - relativedelta(months=3)).replace(hour=0, minute=0, second=0, microsecond=0)
+        case '6mo': return (now - relativedelta(months=6)).replace(hour=0, minute=0, second=0, microsecond=0)
+        case '1y': return (now - relativedelta(years=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        case '2y': return (now - relativedelta(years=2)).replace(hour=0, minute=0, second=0, microsecond=0)
+        case '5y': return (now - relativedelta(years=5)).replace(hour=0, minute=0, second=0, microsecond=0)
+        case '10y': return (now - relativedelta(years=10)).replace(hour=0, minute=0, second=0, microsecond=0)
+        case 'ytd': return (now - relativedelta(month=1, day=1)).replace(hour=0, minute=0, second=0, microsecond=0)
     return None
 
 def get_next_suitable_period(period_input):
@@ -63,16 +63,13 @@ def get_next_suitable_period(period_input):
     match match.group(2):
         case 'd':
             days = int(match.group(1))
-            months = days / 30
-            years = days / 365
         case 'mo':
             months = int(match.group(1))
-            years = months / 12
         case 'y':
             years = int(match.group(1))
 
     if years >= 1:
-        if (years == 1 or years == 2) and months == 0:
+        if years == 1 or years == 2:
             return str(years) + 'y'
         if years <= 5:
             return '5y'

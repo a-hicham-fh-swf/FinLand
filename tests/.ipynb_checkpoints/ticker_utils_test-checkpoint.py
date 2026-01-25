@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 
 # Importiere die Funktionen aus ticker_utils.py
 # (Vorausgesetzt, die Datei ticker_utils.py liegt im selben Verzeichnis)
-import TickerUtils as tu
+import ticker_utils as tu
 
 
 # ----------------------------------------------------------------------
