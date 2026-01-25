@@ -35,7 +35,7 @@ with st.sidebar:
     #tickers_raw = st.text_input(label="Ticker (kommagetrennt)", key="tickers_raw")
     #tickers = [t.strip().upper() for t in tickers_raw.split(",") if t.strip()]
 
-    period_label = st.selectbox("Zeitraum (Period)", ["1D", "5D", "1M", "3M", "6M", "1Y", "2Y", "5Y", "10Y", "YTD", "MAX"], index=3)
+    period_label = st.selectbox("Periode", ["1D", "5D", "1M", "3M", "6M", "1Y", "2Y", "5Y", "10Y", "YTD", "MAX"], index=3)
     period_map = {"1D": "1d", "5D": "5d", "1M": "1mo", "3M": "3mo", "6M": "6mo", "1Y": "1y", "2Y": "2y", "5Y": "5y", "10Y": "10y", "YTD": "ytd", "MAX": "max"}
     period = period_map[period_label]
 
@@ -44,9 +44,9 @@ with st.sidebar:
     use_dates = st.checkbox("Start/Ende verwenden", value=False)
     col_d1, col_d2 = st.columns(2)
     with col_d1:
-        start_date = st.date_input("Von", value=datetime(datetime.now().year, 1, 1))
+        start_date = st.date_input("Von", value=datetime(datetime.now().year, 1, 1), format="DD.MM.YYYY")
     with col_d2:
-        end_date = st.date_input("Bis", value=datetime.now())
+        end_date = st.date_input("Bis", value=datetime.now(), format="DD.MM.YYYY")
 
     st.markdown("---")
     st.subheader("Ticker-Auswahl (für Chart/KPIs)")
