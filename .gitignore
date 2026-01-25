@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# PyCharm / IntelliJ
+.idea/
+*.iml
+
+# Python virtualenv
+.venv/
+
