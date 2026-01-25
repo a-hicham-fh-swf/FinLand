@@ -33,18 +33,21 @@ def search_ticker(search_term):
     if not search_term:
         return []
 
-    # Example using Alpha Vantage API
-    api_key = "ZG5QW2VAJ42NFEAX"
-    url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={search_term}&apikey={api_key}"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    url = "https://query2.finance.yahoo.com/v1/finance/search?"
+    params = {"q": search_term}
 
-    response = requests.get(url)
+    response = requests.get(url, params=params, headers=headers)
     data = response.json()
 
     results = []
-    if "bestMatches" in data:
-        for match in data["bestMatches"]:
-            symbol = match["1. symbol"]
-            name = match["2. name"]
+
+    if 'quotes' in data:
+        stocks = [item for item in data['quotes'] if item.get('quoteType') == 'EQUITY']
+
+        for stock in stocks:
+            symbol = stock.get('symbol')
+            name = stock.get('longname') or stock.get('shortname')
             results.append(
                 (
                     f"{name} ({symbol})",
