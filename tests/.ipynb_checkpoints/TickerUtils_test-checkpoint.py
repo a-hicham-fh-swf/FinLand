@@ -4,8 +4,8 @@ from dateutil.relativedelta import relativedelta
 import pytest
 from unittest.mock import patch, MagicMock
 
-# Importiere die Funktionen aus TickerUtils.py
-# (Vorausgesetzt, die Datei TickerUtils.py liegt im selben Verzeichnis)
+# Importiere die Funktionen aus ticker_utils.py
+# (Vorausgesetzt, die Datei ticker_utils.py liegt im selben Verzeichnis)
 import TickerUtils as tu
 
 
@@ -34,7 +34,7 @@ def mock_ticker_data():
     ])
     df = pd.DataFrame(data, index=index)
     
-    # Sicherstellen, dass der Close-Wert als Series mit 'item()' abrufbar ist, wie in MainApp.py
+    # Sicherstellen, dass der Close-Wert als Series mit 'item()' abrufbar ist, wie in main_app.py
     df['Close'].iloc[-1] = pd.Series([118.0], index=[df.index[-1]])
     return df
 

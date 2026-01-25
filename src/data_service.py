@@ -4,8 +4,8 @@ from datetime import datetime
 from urllib.parse import quote_plus  # <-- WICHTIG
 import feedparser
 import requests
-from Utils import Singleton, TickerCache
-import TickerUtils as tu
+from utils import Singleton, TickerCache
+import ticker_utils as tu
 
 
 def _google_news_rss(query: str, lang="de", country="DE"):

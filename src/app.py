@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 from streamlit_searchbox import st_searchbox
-from DataService import TickerWrapper
-import TickerUtils as tu
+from data_service import TickerWrapper
+import ticker_utils as tu
 
 st.set_page_config(page_title="Aktien Dashboard", layout="wide")
 service = TickerWrapper(ttl_minutes=3)

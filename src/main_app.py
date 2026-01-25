@@ -1,7 +1,7 @@
 import yfinance as yf
 from datetime import datetime
-from Utils import Singleton, TickerCache
-import TickerUtils as tu
+from utils import Singleton, TickerCache
+import ticker_utils as tu
 
 # yf.enable_debug_mode()
 
