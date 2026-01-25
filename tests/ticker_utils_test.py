@@ -115,7 +115,7 @@ def test_get_next_suitable_period_invalid(invalid_period):
 MOCK_NOW = datetime(2025, 12, 15, 10, 30, 0, 123456)
 
 
-@patch('ticker_utils.datetime')
+@patch('datetime.datetime')
 @pytest.mark.parametrize("period, expected_date_str", [
     ('1d', '2025-12-14'), ('5d', '2025-12-10'), ('1mo', '2025-11-15'),
     ('3mo', '2025-09-15'), ('6mo', '2025-06-15'), ('1y', '2024-12-15'),
