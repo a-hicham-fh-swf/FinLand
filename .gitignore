@@ -8,3 +8,11 @@
 # Python virtualenv
 .venv/
 
+# Python bytecode / cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Pytest
+.pytest_cache/
