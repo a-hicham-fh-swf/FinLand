@@ -224,7 +224,6 @@ class TickerWrapper(Singleton):
             pass
 
         # 2) Fallback: Google News RSS (Company + Ticker)
-        company = ""
         try:
             info = yf.Ticker(ticker).info or {}
             company = (info.get("shortName") or info.get("longName") or "").strip()

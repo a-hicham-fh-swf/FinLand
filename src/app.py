@@ -28,13 +28,7 @@ with st.sidebar:
 
     if selected and selected['symbol']:
         symbol = selected['symbol']
-        #current_tickers = st.session_state.tickers_raw.split(',')
-        #current_tickers = [t.strip() for t in current_tickers if t.strip()]
-
         tickers.add(symbol)
-
-    #tickers_raw = st.text_input(label="Ticker (kommagetrennt)", key="tickers_raw")
-    #tickers = [t.strip().upper() for t in tickers_raw.split(",") if t.strip()]
 
     period_label = st.selectbox("Periode", ["1D", "5D", "1M", "3M", "6M", "1Y", "2Y", "5Y", "10Y", "YTD", "MAX"], index=3)
     period_map = {"1D": "1d", "5D": "5d", "1M": "1mo", "3M": "3mo", "6M": "6mo", "1Y": "1y", "2Y": "2y", "5Y": "5y", "10Y": "10y", "YTD": "ytd", "MAX": "max"}
@@ -52,7 +46,6 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("Ticker-Auswahl (für Chart/KPIs)")
     # wird später gefüllt, sobald Daten da sind
-
 
 # ---------------- Data Load ----------------
 if not tickers:
@@ -117,8 +110,6 @@ with left:
     if chart_df.empty:
         st.warning("Keine Close-Daten zum Plotten.")
     else:
-        # Index sauber ausrichten (gemeinsame Zeitachse)
-        
         chart_df = chart_df.sort_index()
         chart_df = chart_df.dropna(how="all")
 
