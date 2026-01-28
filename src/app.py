@@ -4,6 +4,7 @@ from datetime import datetime
 from streamlit_searchbox import st_searchbox
 from data_service import TickerWrapper
 import ticker_utils as tu
+from ui_logic import fmt, format_percent_change, should_show_chart
 
 st.set_page_config(page_title="Aktien Dashboard", layout="wide")
 service = TickerWrapper(ttl_minutes=3)
@@ -142,15 +143,16 @@ with right:
     df0 = data[t0]
     info0 = info.get(t0, {}) or {}
 
-    def fmt(x):
-        if x is None:
-            return "n/a"
-        try:
-            if isinstance(x, (float, int)):
-                return f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-            return str(x)
-        except Exception:
-            return "n/a"
+    # --- entfernt: lokale fmt-Funktion, wir nutzen fmt aus ui_logic.py ---
+    #def fmt(x):
+    #    if x is None:
+    #        return "n/a"
+    #    try:
+    #        if isinstance(x, (float, int)):
+    #            return f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    #        return str(x)
+    #    except Exception:
+    #        return "n/a"
 
     close = tu.get_latest_close(df0) if df0 is not None else None
     interval_text = tu.get_interval_text(df0) if df0 is not None else "n/a"
