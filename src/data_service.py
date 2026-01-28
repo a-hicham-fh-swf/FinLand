@@ -1,11 +1,11 @@
 import yfinance as yf
 import pandas as pd
-from datetime import datetime
-from urllib.parse import quote_plus  # <-- WICHTIG
 import feedparser
 import requests
-from utils import Singleton, TickerCache
 import ticker_utils as tu
+from datetime import datetime
+from urllib.parse import quote_plus
+from utils import Singleton, TickerCache
 
 
 def _google_news_rss(query: str, lang="de", country="DE"):
@@ -29,7 +29,18 @@ def _google_news_rss(query: str, lang="de", country="DE"):
 
 
 def search_ticker(search_term):
-    """Search for stock tickers based on company name"""
+    """
+    Search for stock tickers and company names
+
+    Parameters
+    ----------
+    search_term : str
+        The tickers or company names to look for
+    Returns
+    -------
+    list[str]
+        The found stock tickers and company names
+    """
     if not search_term:
         return []
 
@@ -43,6 +54,12 @@ def search_ticker(search_term):
     results = []
 
     if 'quotes' in data:
+        # EQUITY: Standard stocks or company shares (e.g., AAPL for Apple Inc.).
+        # ETF: Exchange-traded funds tracking indexes or sectors.
+        # MUTUAL FUND: Pooled investment funds (often mentioned alongside ETFs in lookups).
+        # OPTION: Derivatives contracts for buying/selling underlying assets.
+        # INDEX: Market benchmarks like S&P 500.
+        # FUTURE: Contracts for future asset delivery.
         stocks = [item for item in data['quotes'] if item.get('quoteType') == 'EQUITY']
 
         for stock in stocks:
@@ -82,10 +99,36 @@ def _normalize_history_frame(fetched: pd.DataFrame, ticker: str) -> pd.DataFrame
 
 
 class TickerWrapper(Singleton):
+    """
+    Main data provider for ticker symbols. Caches data to improve access speed.
+    Implemented as Singleton.
+    """
     def __init__(self, ttl_minutes=3):
+        """
+        Constructor for TickerWrapper
+
+        Parameters
+        ----------
+        ttl_minutes : int, optional
+            The time to live for the cache in minutes. Default is 3-minutes.
+        """
         self.__ticker_cache = TickerCache(ttl_minutes)
 
-    def get_ticker_data(self, tickers, period="1y"):
+    def get_ticker_data(self, tickers: str | list[str], period="1y"):
+        """
+        Gets the stock data for the provided tickers for the provided period
+
+        Parameters
+        ----------
+        tickers : str | list of str
+            The ticker symbols to get data for
+        period: str, optional
+            The period to get the data for. Default is 1-year
+        Returns
+        -------
+        dict[str, Any | None]
+            The stock data for the provided tickers
+        """
         if not tickers:
             return {}
 
@@ -100,7 +143,7 @@ class TickerWrapper(Singleton):
 
         now = datetime.now()
         data = {t: self.__ticker_cache.get(t, period, now) for t in tickers}
-        missing = [t for t, v in data.items() if v is None]
+        missing = [key for key, value in data.items() if value is None]
 
         if missing:
             try:
@@ -122,6 +165,22 @@ class TickerWrapper(Singleton):
         return data
 
     def get_ticker_data_by_dates(self, tickers, start_date, end_date):
+        """
+        Gets the stock data for the provided tickers in the provided period
+
+        Parameters
+        ----------
+        tickers : str | list of str
+            The ticker symbols to get data for
+        start_date: datetime
+            The start date to get the data for
+        end_date: datetime
+            The end date to get the data for
+        Returns
+        -------
+        dict[str, Any | None] | None
+            The stock data for the provided tickers
+        """
         if isinstance(tickers, str):
             tickers = [tickers]
         tickers = [t.strip().upper() for t in tickers if t.strip()]

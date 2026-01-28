@@ -3,11 +3,11 @@ import sys
 import webbrowser
 
 def main():
-    # Pfad zur app.py ermitteln (funktioniert auch in PyInstaller)
+    # Pfad zur app.py ermitteln
     base = os.path.dirname(os.path.abspath(__file__))
     app_path = os.path.join(base, "app.py")
 
-    # Browser öffnen (optional)
+    # Browser öffnen
     webbrowser.open("http://localhost:8501")
 
     # Streamlit in-process starten (KEIN subprocess!)

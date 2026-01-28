@@ -5,7 +5,6 @@ import sys
 import os
 from unittest.mock import patch, MagicMock
 
-# ... (Setup-Code unverändert) ...
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
@@ -17,7 +16,7 @@ except ImportError as e:
 
 
 # ----------------------------------------------------------------------
-# 1. Fixture für Mock-Daten (unverändert)
+# 1. Fixture für Mock-Daten
 # ----------------------------------------------------------------------
 @pytest.fixture
 def mock_ticker_data():
@@ -38,7 +37,7 @@ def mock_ticker_data():
 
 
 # ----------------------------------------------------------------------
-# 2. Tests für Analysefunktionen (mit verbesserter Assertion-Meldung)
+# 2. Tests für Analysefunktionen
 # ----------------------------------------------------------------------
 
 def test_get_latest_close(mock_ticker_data):
@@ -81,7 +80,7 @@ def test_get_interval_text(mock_ticker_data):
 
 
 # ----------------------------------------------------------------------
-# 3. Tests für get_next_suitable_period (Assertions unverändert, da Fehler von Pytest gut gemeldet werden)
+# 3. Tests für get_next_suitable_period
 # ----------------------------------------------------------------------
 
 @pytest.mark.parametrize("input_period, expected_period", [
@@ -124,18 +123,15 @@ MOCK_NOW = datetime(2025, 12, 15, 10, 30, 0, 123456)
 def test_get_min_date_in_period_from_now(mock_datetime, period, expected_date_str):
     """Testet, ob das korrekte Startdatum basierend auf der Periode berechnet wird."""
 
-    # ... (Mocking-Setup unverändert) ...
     mock_datetime.now.return_value = MOCK_NOW
     mock_datetime.datetime = MagicMock(side_effect=lambda *args, **kwargs: datetime(*args, **kwargs))
     mock_datetime.datetime.now.return_value = MOCK_NOW
 
     min_date = tu.get_min_date_in_period_from_now(period, MOCK_NOW)
 
-    # Verbessertes Assertion für das Datum
     actual_date_str = min_date.strftime('%Y-%m-%d')
     assert actual_date_str == expected_date_str, \
         f"Periode '{period}': Erwartetes Startdatum {expected_date_str}, aber {actual_date_str} gefunden."
 
-    # Verbessertes Assertion für die Uhrzeit
     assert min_date.hour == 0 and min_date.minute == 0 and min_date.second == 0 and min_date.microsecond == 0, \
         f"Die Zeit wurde nicht korrekt auf Mitternacht zurückgesetzt: {min_date.time()}."

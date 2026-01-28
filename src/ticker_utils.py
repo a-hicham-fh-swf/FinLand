@@ -1,33 +1,130 @@
 import re
+import pandas as pd
 from datetime import timedelta
-
 from dateutil.relativedelta import relativedelta
 
-__compiled_pattern = re.compile('^([1-9][0-9]*)(d|mo|y)$')
 
-def get_latest_close(ticker_data):
-    return ticker_data['Close'].iloc[-1]
+__compiled_period_pattern = re.compile('^([1-9][0-9]*)(d|mo|y)$')
 
-def get_interval_text(ticker_data):
+def get_latest_close(ticker_data: pd.DataFrame):
+    """Gets the latest Close value from the provided ticker_data
+
+    Parameters
+    ----------
+    ticker_data : DataFrame
+        The DataFrame holding the information
+    Returns
+    -------
+    object | None
+        The latest Close value
+    """
+    if isinstance(ticker_data, pd.DataFrame):
+        return ticker_data['Close'].iloc[-1]
+    return None
+
+
+def get_interval_text(ticker_data: pd.DataFrame):
+    """Gets a string representation of the start and end date
+    for the provided ticker_data holding ticker information
+
+    Parameters
+    ----------
+    ticker_data : DataFrame
+        The DataFrame holding the information
+    Returns
+    -------
+    str
+        The string representation of the start and end dates
+    """
     start_date = get_start_date(ticker_data)
     end_date = get_end_date(ticker_data)
     return f'vom {start_date.strftime("%d.%m.%Y")} bis {end_date.strftime("%d.%m.%Y")}'
 
-def get_start_date(ticker_data):
-    return ticker_data.index.min().date()
 
-def get_end_date(ticker_data):
-    return ticker_data.index.max().date()
+def get_start_date(ticker_data: pd.DataFrame):
+    """Gets the start date of the provided ticker_data
 
-def get_high_market_price(ticker_data):
+    Parameters
+    ----------
+    ticker_data : DataFrame
+        The DataFrame holding the information
+    Returns
+    -------
+    datetime.datetime | None
+        The start date of the ticker_data
+    """
+    if isinstance(ticker_data, pd.DataFrame):
+        return ticker_data.index.min().date()
+    return None
+
+
+def get_end_date(ticker_data: pd.DataFrame):
+    """Gets the end date of the provided ticker_data
+
+    Parameters
+    ----------
+    ticker_data : DataFrame
+        The DataFrame holding the information
+    Returns
+    -------
+    datetime.datetime | None
+        The end date of the ticker_data
+    """
+    if isinstance(ticker_data, pd.DataFrame):
+        return ticker_data.index.max().date()
+    return None
+
+
+def get_high_market_price(ticker_data: pd.DataFrame):
+    """Gets the highest High value and the corresponding date from the provided ticker_data
+
+    Parameters
+    ----------
+    ticker_data : DataFrame
+        The DataFrame holding the information
+    Returns
+    -------
+    object, datetime.datetime | None
+        The highest High value and the corresponding date
+    """
+    if not isinstance(ticker_data, pd.DataFrame):
+        return None
     high_market_price_date = ticker_data['High'].idxmax()
     return ticker_data.loc[high_market_price_date]['High'], high_market_price_date
 
-def get_low_market_price(ticker_data):
+
+def get_low_market_price(ticker_data: pd.DataFrame):
+    """Gets the lowest Low value and the corresponding date from the provided ticker_data
+
+    Parameters
+    ----------
+    ticker_data : DataFrame
+        The DataFrame holding the information
+    Returns
+    -------
+    object, datetime.datetime | None
+        The lowest Low value and the corresponding date
+    """
+    if not isinstance(ticker_data, pd.DataFrame):
+        return None
     low_market_price_date = ticker_data['Low'].idxmin()
     return ticker_data.loc[low_market_price_date]['Low'], low_market_price_date
 
+
 def get_min_date_in_period_from_now(period, now):
+    """Calculates the datetime resulting from the provided now and period parameters
+
+    Parameters
+    ----------
+    period : str
+        The period to calculate
+    now : datetime.datetime
+        The base datetime to calculate the period for
+    Returns
+    -------
+    datetime.datetime | None
+        The calculated datetime
+    """
     period = get_next_suitable_period(period)
     print(f'found period: {period}')
     match period:
@@ -43,7 +140,19 @@ def get_min_date_in_period_from_now(period, now):
         case 'ytd': return (now - relativedelta(month=1, day=1)).replace(hour=0, minute=0, second=0, microsecond=0)
     return None
 
+
 def get_next_suitable_period(period_input):
+    """Calculates the next suitable period for the given period_input
+
+    Parameters
+    ----------
+    period_input : str
+        The period_input to calculate the period for
+    Returns
+    -------
+    str | None
+        The calculated period
+    """
     # 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
     if not period_input or period_input == 'max':
         return None
@@ -51,7 +160,7 @@ def get_next_suitable_period(period_input):
     if period_input == 'ytd':
         return period_input
 
-    match = __compiled_pattern.match(period_input)
+    match = __compiled_period_pattern.match(period_input)
 
     if match is None:
         raise ValueError('Invalid input')
