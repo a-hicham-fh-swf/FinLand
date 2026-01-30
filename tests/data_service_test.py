@@ -7,7 +7,7 @@ import types
 #
 # Hintergrund:
 # Beim Import von data_service wird "import yfinance as yf" ausgeführt.
-# Auf deinem System crasht das wegen einer fehlenden nativen Library.
+# Auf macOS crasht das wegen einer fehlenden nativen Library.
 #
 # Lösung für Unit-Tests:
 # Wir stellen im Test ein Fake-Modul "yfinance" bereit, bevor data_service importiert wird.
