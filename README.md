@@ -9,14 +9,13 @@ Die Anwendung basiert auf Python, Streamlit und externen Finanzdatenquellen und 
 
 ## Team & Verantwortlichkeiten
 
-| Name | Schwerpunkt | Rolle |
-|---|---|---|
-| Aït Ayad, Hicham | Backend-Entwicklung (Datenzugriff, Services, Business-Logik) | Product Owner |
-| Burgsmüller, Sven | Testing von Utility-Funktionen sowie grundlegender Datenaufbereitung (z. B. Hilfsfunktionen für Kurswerte, Zeiträume) | Scrum Master |
-| Calcara, Matthias | Testing von zentraler DataService-Logik, UI-naher Logik, Smoke-Tests, Startpfad der Anwendung | Scrum Master |
-| Friedel, Christian | Frontend-Entwicklung (UI, Visualisierung, Nutzerinteraktion) | Product Owner |
+| Name | Schwerpunkt                                                                                                                                                                                                                                 | Rolle                    |
+|---|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| Aït Ayad, Hicham | Backend-Entwicklung (Datenzugriff, Services, Business-Logik)                                                                                                                                                                                | Product Owner; Developer |
+| Burgsmüller, Sven | Testing von Utility-Funktionen sowie grundlegender Datenaufbereitung (z. B. Hilfsfunktionen für Kurswerte, Zeiträume); Requirements Engineering, Erstellung/Pflege Kanban-Board mit Ticket-Backlog sowie Ausarbeitung Testfälle/Testkonzept | Scrum Master; Developer  |
+| Calcara, Matthias | Testing von zentraler DataService-Logik, UI-naher Logik, Smoke-Tests, Startpfad der Anwendung; Requirements Engineering, Erstellung/Pflege Kanban-Board mit Ticket-Backlog sowie Ausarbeitung Testfälle/Testkonzept                         | Scrum Master; Developer  |
+| Friedel, Christian | Frontend-Entwicklung (UI, Visualisierung, Nutzerinteraktion)                                                                                                                                                                                | Product Owner; Developer |
 
-Die Testverantwortung wurde bewusst funktional aufgeteilt, nicht nur formal nach Dateien.
 
 ---
 
@@ -75,12 +74,20 @@ Die Tests decken sowohl Backend-Logik als auch UI-nahe Logik und Startpfade ab.
 → Smoke-Test: App-Import ohne Crash (Kapitel 4.4)
 * tests/run_app_test.py
 → Entry-Point-Test für run_app.py (Kapitel 4.4)
+* tests/test_TickerUtils.py
+→ Grundlegende Datenaufbereitung (Kapitel 4.1)
+* tests/test_Utils.py
+→ Utility-Funktionen (Kapitel 4.2)
 
 ### Tests ausführen
 
 ```bash
 python -m pytest
 ```
+
+### Aktueller Status (Repo-Stand)
+
+Gesamter Testlauf (python -m pytest): 45/45 Tests erfolgreich
 
 ## Hinweise zur Implementierung
 
@@ -157,19 +164,11 @@ Im Folgenden sind die zentralen Module des Projekts einzeln aufgeführt, damit d
   - Singleton-Implementierung (`Singleton`),
   - Ticker-Cache mit TTL-Logik (`TickerCache`) und Cache-Verwaltung.
 
-- **`src/main_app.py` (CLI/Console-Variante)**  
-  Konsolenbasierte Variante zur Abfrage/Analyse von Tickern (Eingabe über Terminal).  
-  Aufgaben:
-  - Start über `__main__` und `input()`-Dialog,
-  - Abruf von Kursdaten über `yfinance` (inkl. Periodenlogik),
-  - Ausgabe von Kennzahlen (aktueller Close, High/Low, YTD-Performance),
-  - nutzt `utils.Singleton`, `utils.TickerCache` sowie `ticker_utils`.
-
 ---
 
 ### Kategorisierung (zusätzliche Einordnung)
 
-- **Start / Entry Point:** `run_app.py` (Streamlit), `main_app.py` (CLI)
+- **Start / Entry Point:** `run_app.py` (Streamlit)
 - **UI / Orchestrierung:** `app.py`
 - **Service / Datenzugriff:** `data_service.py`
 - **Logik & Utilities:** `ticker_utils.py`, `ui_logic.py`, `utils.py`
@@ -261,23 +260,20 @@ Die finale requirements.txt wurde gemäß Vorgabe des Dozenten am Ende per pip f
 
 ### KI-Unterstützung
 
-OpenAI ChatGPT wurde zur Unterstützung bei:
-* Konzeption und Implementierung von pytest-Tests
-* Testarchitektur (Mocking, Isolation, Smoke-Tests)
-* Strukturierung der technischen Dokumentation
-eingesetzt.
+Im Rahmen der Projektarbeit wurden KI-gestützte Assistenzsysteme als unterstützende Werkzeuge eingesetzt, darunter OpenAI ChatGPT, Google Gemini und Perplexity AI.
+
+Die KI-Tools wurden unter anderem zur Unterstützung bei folgenden Tätigkeiten genutzt:
+
+- Konzeption und Weiterentwicklung der Softwarearchitektur
+- Unterstützung bei Implementierungsfragen (z. B. Python, Streamlit, pytest)
+- Entwurf und Überprüfung automatisierter Tests
+- Strukturierung und Formulierung technischer Dokumentation
+- Klärung von Verständnisfragen zu Bibliotheken, Frameworks und Best Practices
 
 ### Fachliche Quellen
 
-* Offizielle Dokumentationen von pytest, pandas und Streamlit
+* Offizielle Dokumentationen von yfinance, pytest, stackoverflow, pandas und Streamlit
 * Python-Standardbibliothek (unittest.mock, sys, os)
-
-Die KI-Unterstützung diente ausschließlich als Hilfsmittel;
-Verständnis, Integration und Abnahme der Ergebnisse erfolgten eigenständig.
+* Severance, C. (2022). Python für alle. Einführung in die Datenanalyse mit Python 3 (F. Eberts / H. Giefers, Übers.). CreateSpace Independent Publishing Platform. (Original erschienen 2016).
 
 ---
-
-## Aktueller Status (Repo-Stand)
-
-* Gesamter Testlauf (python -m pytest): 60/60 Tests erfolgreich
-* Testanteil (DataService, UI-Logik, Smoke- & Starttests): 17/17 Tests, vollständig grün
