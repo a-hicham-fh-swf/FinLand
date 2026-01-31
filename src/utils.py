@@ -31,6 +31,8 @@ class TickerCache:
             The tickers to get the data for
         period : str
             The period to get the data for
+        now : datetime, optional
+            The base date to check against. Default is datetime.now()
         Returns
         -------
         DataFrame | None
@@ -66,7 +68,7 @@ class TickerCache:
 
         Parameters
         ----------
-        tickers : str
+        tickers : dict[str, Any | None]
             The tickers data
         period : str
             The period the data was watched for

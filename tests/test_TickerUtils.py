@@ -1,8 +1,6 @@
 import pytest
 import pandas as pd
-import numpy as np
 from datetime import datetime
-from unittest.mock import patch
 import ticker_utils as tu
 
 
@@ -107,7 +105,6 @@ def test_TC_TU_009_empty_dataframe():
     """
     TC_TU_009 – Empty DataFrame
     Prüft das Verhalten des Systems, wenn keine Daten gefunden wurden.
-
     """
     empty_df = pd.DataFrame(columns=['Close', 'High', 'Low', 'Open'])
 

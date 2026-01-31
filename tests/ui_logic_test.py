@@ -1,5 +1,4 @@
 import pandas as pd
-
 from ui_logic import fmt, format_percent_change, should_show_chart
 
 

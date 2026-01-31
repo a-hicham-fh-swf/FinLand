@@ -1,4 +1,3 @@
-import pytest
 from datetime import datetime, timedelta
 from utils import Singleton, TickerCache
 
@@ -13,7 +12,7 @@ def test_TC_U_001_singleton_identity():
     """Prüft, ob das Singleton-Pattern wirklich nur eine Instanz zulässt."""
     s1 = DatabaseConnection()
     s2 = DatabaseConnection()
-    # In einer Präsentation: 'Beide Variablen zeigen auf die exakt selbe Speicheradresse'
+
     assert s1 is s2
 
 
@@ -50,7 +49,6 @@ def test_TC_U_003_cache_expiration():
 def test_TC_U_004_cache_miss_incompatible_period():
     """
     TC_U_004 – Cache miss wenn Periode nicht passt.
-
     """
     cache = TickerCache(ttl_minutes=5)
     now = datetime(2025, 1, 10, 12, 0)

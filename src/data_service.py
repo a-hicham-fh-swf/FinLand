@@ -101,7 +101,7 @@ def _normalize_history_frame(fetched: pd.DataFrame, ticker: str) -> pd.DataFrame
 class TickerWrapper(Singleton):
     """
     Main data provider for ticker symbols. Caches data to improve access speed.
-    Implemented as Singleton.
+    Implemented as a Singleton.
     """
     def __init__(self, ttl_minutes=3):
         """

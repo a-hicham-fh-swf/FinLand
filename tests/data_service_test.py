@@ -41,7 +41,6 @@ sys.modules["yfinance"] = fake_yfinance
 import pandas as pd
 import pytest
 from unittest.mock import MagicMock, patch
-
 import utils
 import data_service as ds
 
